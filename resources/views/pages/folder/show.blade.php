@@ -55,10 +55,10 @@
                                     <p class="card-text mt-2 complex-name d-none">{{ $file->name }}</p>
                                     <button class="btn btn-link read-more-btn p-0">Read More</button>
                                     <!-- Delete button -->
-                                    <form action="{{ route('file.destroy', $file->id) }}" method="POST" class="mt-2">
+                                    <form action="{{ route('file.destroy', $file->id) }}" method="POST" class="mt-2 delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn">Delete</button>
                                     </form>
                                 </div>
                             </div>
@@ -111,5 +111,25 @@
                 autoplayVideos: true
             });
         });
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const form = this.closest('form');
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
     </script>
 @endsection
