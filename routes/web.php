@@ -18,20 +18,25 @@ use App\Http\Controllers\LoginController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
-Route::resources([
-    'user'=>UserController::class
-]);
+Route::group(['middleware' => 'auth'], function () {
+    Route::resources([
+        'user' => UserController::class
+    ]);
 
-Route::get('/folder', [FolderController::class, 'index'])->name('folder.index');
-Route::post('/folder', [FolderController::class, 'store'])->name('folder.store');
-Route::get('/folder/{slug}', [FolderController::class, 'show'])->name('folder.show');
+    Route::get('/folder', [FolderController::class, 'index'])->name('folder.index');
+    Route::post('/folder', [FolderController::class, 'store'])->name('folder.store');
+    Route::get('/folder/{slug}', [FolderController::class, 'show'])->name('folder.show');
 
-Route::post('/file', [FileController::class, 'store'])->name('file.store');
-Route::delete('/file/{id}', [FileController::class, 'destroy'])->name('file.destroy');
+    Route::post('/file', [FileController::class, 'store'])->name('file.store');
+    Route::delete('/file/{id}', [FileController::class, 'destroy'])->name('file.destroy');
 
-Route::get('/login', [LoginController::class, 'index'])->name('login');
-Route::post('/login', [LoginController::class, 'auth'])->name('login.auth');
-Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+});
+
+Route::group(['middleware' => 'guest'], function () {
+    Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::post('/login', [LoginController::class, 'auth'])->name('login.auth');
+});
