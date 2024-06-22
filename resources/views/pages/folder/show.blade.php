@@ -45,9 +45,9 @@
                     @foreach ($files as $file)
                         <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
                             <div class="card text-center h-100" style="box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                                <a href="{{ $file->url }}" class="glightbox" data-gallery="gallery">
-                                    <img data-src="{{ $file->url }}" class="card-img-top mx-auto d-block mt-3 lazyload"
-                                        alt="{{ $file->name }}"
+                                <a href="{{ asset($file->path) }}" class="glightbox" data-gallery="gallery">
+                                    <img data-src="{{ file_exists(public_path($file->path)) ? asset($file->path) : asset('assets/img/not_found_img.jpg') }}"
+                                        class="card-img-top mx-auto d-block mt-3 lazyload" alt="{{ $file->name }}"
                                         style="width: 100px; height: 100px;">
                                 </a>
                                 <div class="card-body d-flex flex-column justify-content-center">
@@ -66,7 +66,7 @@
                     @endforeach
                 </div>
             </div>
-
+            {{ $files->appends(request()->input())->links() }}
 
         </div>
     </div>

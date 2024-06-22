@@ -19,7 +19,7 @@ class UserController extends Controller
 
         $data['title'] = 'Daftar User';
         $data['page'] = 'user';
-        $data['user'] = User::latest()->filter(request(['search']))->paginate(10)->withQueryString();
+        $data['user'] = User::latest()->filter(request(['search']))->paginate(5)->withQueryString();
         return view('pages.user.index', $data);
     }
 
@@ -37,7 +37,7 @@ class UserController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
-                'email' => 'required',
+                'email' => 'required|unique:users,email',
             ]);
 
             if ($validator->fails()) {
@@ -79,36 +79,42 @@ class UserController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        try {
-            DB::beginTransaction();
-            $validator = Validator::make($request->all(), [
-                'name' => 'required',
-                'email' => 'required',
-                'password' => 'nullable'
-            ]);
+{
+    try {
+        DB::beginTransaction();
 
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
-            }
+        $user = User::findOrFail($id);
 
-            $data = $request->only(['name', 'email']);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable'
+        ]);
 
-            if ($request->filled('password')) {
-                $data['password'] = bcrypt($request->input('password'));
-            }
-
-            User::find($id)->update($data);
-            DB::commit();
-            Alert::success('User edited successfully');
-            return redirect()->route('user.index')->with('success', 'Data Berhasil Diedit');
-        } catch (Throwable $e) {
-            DB::rollback();
-            Log::debug('UserController update() ' . $e->getMessage());
-            Alert::error('User edited failed');
-            return redirect()->back()->with('error', $e->getMessage());
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
         }
+
+        $data = $request->only(['name', 'email']);
+
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->input('password'));
+        }
+
+        $user->update($data);
+
+        DB::commit();
+
+        Alert::success('User edited successfully');
+        return redirect()->route('user.index')->with('success', 'Data Berhasil Diedit');
+    } catch (Throwable $e) {
+        DB::rollback();
+        Log::debug('UserController update() ' . $e->getMessage());
+        Alert::error('User edited failed');
+        return redirect()->back()->with('error', $e->getMessage());
     }
+}
+
 
     public function destroy($id)
     {

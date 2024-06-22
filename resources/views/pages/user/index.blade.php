@@ -4,6 +4,7 @@
     @include('component._sidebar')
 @endsection
 @section('content')
+    <div class="card">
         <div class="card-body">
             <div class="mb-3">
                 <form action="{{ route('user.index') }}" method="GET">
@@ -50,6 +51,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                {{ $user->links() }}
             </div>
         </div>
     </div>
