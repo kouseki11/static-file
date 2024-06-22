@@ -50,6 +50,6 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         Alert::success('Logout Success', 'User Logout Success!');
-        return redirect('/')->with('logout', 'User Logout Success!');
+        return redirect('/login')->with('logout', 'User Logout Success!');
     }
 }
